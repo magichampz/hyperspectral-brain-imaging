@@ -17,4 +17,4 @@ xlabel('Wavelength')
 ylabel('Data')
 
 %% new section
-disp(5);
+disp(7)
