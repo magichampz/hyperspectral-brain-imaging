@@ -16,3 +16,5 @@ title('First Pixel Spectra')
 xlabel('Wavelength')
 ylabel('Data')
 
+%% test
+disp(5);
