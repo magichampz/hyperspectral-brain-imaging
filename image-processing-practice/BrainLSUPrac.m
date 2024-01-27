@@ -1,4 +1,4 @@
-
+%% Data Calibration and Loading
 hcube = hypercube('raw.hdr');
 
 dark_ref = multibandread('darkReference', [285, 1, hcube.Metadata.Bands], 'uint16=>uint16', 0, 'bil', 'ieee-le');
@@ -17,6 +17,7 @@ calibratedData = calibratedData(1:end-numCorruptedRows, :, :);
 
 calibratedHypercube = hypercube(calibratedData, hcube.Wavelength);
 
+%% Show calibrated data with corrections to make more visible
 figure(1);
 
 subplot(1,2,1);
@@ -28,7 +29,6 @@ minVal = min(calibratedHypercube.DataCube(:));
 maxVal = max(calibratedHypercube.DataCube(:));
 stretchedData = (calibratedHypercube.DataCube - minVal) / (maxVal - minVal);
 
-% Initialize an array for the gamma-corrected data
 gammaCorrectedData = zeros(size(stretchedData));
 
 % Apply a gamma correction to each band
@@ -42,13 +42,12 @@ gammaCorrectedHypercube = hypercube(gammaCorrectedData, calibratedHypercube.Wave
 % Colorize the gamma-corrected hypercube data
 rgbImage = colorize(gammaCorrectedHypercube, 'Method', 'rgb');
 
-% Display the result
 subplot(1,2,2);
 imshow(rgbImage);
 
-
 figure(2);
 
+%% Endmember Analysis
 numEndmembers = countEndmembersHFC(calibratedData,'PFA',10^-7);
 endmembers = nfindr(calibratedData, numEndmembers,'NumIterations',1000,'ReductionMethod','PCA');
 
@@ -62,6 +61,7 @@ for i = 1:numEndmembers
     ylabel('Reflectance');
 end
 
+%% Abundance Map
 figure(3);
 abundanceMap = estimateAbundanceLS(calibratedData,endmembers);
 montage(abundanceMap,'Size',[4 4],'BorderSize',[10 10]);
