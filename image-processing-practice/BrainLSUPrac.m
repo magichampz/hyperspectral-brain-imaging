@@ -15,36 +15,41 @@ calibratedData(calibratedData < 0) = 0;
 numCorruptedRows = 100; 
 calibratedData = calibratedData(1:end-numCorruptedRows, :, :);
 
+calibratedData = calibratedData(:,40:end-numCorruptedRows, :);
+
 calibratedHypercube = hypercube(calibratedData, hcube.Wavelength);
 
+
 %% Show calibrated data with corrections to make more visible
+
 figure(1);
 
 subplot(1,2,1);
 rgbImage = colorize(calibratedHypercube, 'Method', 'rgb');
-imshow(rgbImage);
+imshow(rgbImage)
 
-% Perform linear stretching on the calibrated data
-minVal = min(calibratedHypercube.DataCube(:));
-maxVal = max(calibratedHypercube.DataCube(:));
-stretchedData = (calibratedHypercube.DataCube - minVal) / (maxVal - minVal);
+subplot (1,2,2);
 
-gammaCorrectedData = zeros(size(stretchedData));
+% Find the band indices closest to the selected wavelengths
+[~, redBandIndex] = min(abs(hcube.Wavelength - 628));
+[~, greenBandIndex] = min(abs(hcube.Wavelength - 517));
+[~, blueBandIndex] = min(abs(hcube.Wavelength - 565));
 
-% Apply a gamma correction to each band
-for b = 1:size(stretchedData, 3)
-    gammaCorrectedData(:, :, b) = imadjust(stretchedData(:, :, b), [], [], 0.5);
-end
+% Extract the bands for false color image
+redBand = calibratedData(:,:,redBandIndex);
+greenBand = calibratedData(:,:,greenBandIndex);
+blueBand = calibratedData(:,:,blueBandIndex);
 
-% Create a new hypercube object with the stretched and gamma-corrected data
-gammaCorrectedHypercube = hypercube(gammaCorrectedData, calibratedHypercube.Wavelength);
+% Normalize and stack the bands to create an RGB image
+redNormalized = (redBand - min(redBand(:))) / (max(redBand(:)) - min(redBand(:)));
+greenNormalized = (greenBand - min(greenBand(:))) / (max(greenBand(:)) - min(greenBand(:)));
+blueNormalized = (blueBand - min(blueBand(:))) / (max(blueBand(:)) - min(blueBand(:)));
 
-% Colorize the gamma-corrected hypercube data
-rgbImage = colorize(gammaCorrectedHypercube, 'Method', 'rgb');
+falseColorImage = cat(3, redNormalized, greenNormalized, blueNormalized);
 
-subplot(1,2,2);
-imshow(rgbImage);
-
+% Display the false color image
+imshow(falseColorImage);
+title('False Color Image based on PCA');
 figure(2);
 
 %% Endmember Analysis
