@@ -1,0 +1,1 @@
+ENVIdescription = {HSI Human Brain Database - https://hsibraindatabase.iuma.ulpgc.es/}samples = 476lines = 493bands = 1data type = 12byte order = 0interleave = bilheader offset = 0Class ID (0) = Pixel Not LabeledClass ID (1) = Normal TissueClass ID (2) = Tumor TissueClass ID (3) = Hypervascularized TissueClass ID (4) = Background
